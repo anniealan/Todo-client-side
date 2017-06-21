@@ -1,12 +1,15 @@
 const express = require('express')
 const path = require('path')
 const bodyParser = require('body-parser')
+const expressValidator = require('express-validator')
 const PORT = 8080
 const app = express()
 const router = require('./router')
 
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(bodyParser. json())
+
+app.use(expressValidator())
 
 app.use(express.static('public'))
 

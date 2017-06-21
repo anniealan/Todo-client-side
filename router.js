@@ -19,10 +19,18 @@ router.get('/todos', (req, res) => {
 })
 
 router.post('/todos', (req, res) => {
-  const data = req.body
-  data.id = Math.floor((Math.random() * 10000))
-  todos.push(data)
-  res.send(todos)
+  req.checkBody('title', 'Title is required').notEmpty()
+  req.getValidationResult()
+    .then(result => result.array())
+    .then(result=>{
+      if(result.length <= 0) {
+        const data = req.body
+        data.id = Math.floor((Math.random() * 10000))
+        todos.push(data)
+      }
+      res.send(todos)
+    })
+
 })
 router.delete('/todos/:id', (req, res) => {
   const {id} = req.params
@@ -37,12 +45,19 @@ router.delete('/todos/:id', (req, res) => {
 router.put('/todos/:id', (req, res) => {
   const {id} = req.params
   const {title} = req.body
-  todos.map((todo, index) => {
-    if (todo.id == id) {
-      todo.title = title
-    }
-  })
-  res.json(todos)
+  req.checkBody('title', 'Title is required').notEmpty()
+  req.getValidationResult()
+    .then(result => result.array())
+    .then(result=>{
+      if(result <= 0){
+        todos.map((todo, index) => {
+          if (todo.id == id) {
+            todo.title = title
+          }
+        })
+      }
+      res.json(todos)
+    })
 })
 
 module.exports = router
