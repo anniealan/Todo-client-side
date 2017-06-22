@@ -3,9 +3,9 @@ function render(root, component) {
 }
 const root = document.getElementById("app")
 
-fetch('api/todos').then(result => result.json()).then(result => {
-  App.todos = result
-  render(root, App.display(result))
+fetch('api/todos', {credentials: 'include'}).then(result => result.json()).then(result => {
+  App.todos = result.tasks
+  render(root, App.display(result.tasks))
 })
 
 const App = {
@@ -21,7 +21,7 @@ const App = {
   },
   editForm(todo) {
     return (`<input type='text' value=${todo.title} id='title'>
-          <button onclick="App.update(${todo.id}, document.getElementById('title').value)">Update</button>
+          <button onclick="App.update('${todo._id}', document.getElementById('title').value)">Update</button>
           <p id = "err"></p>`)
   },
   todoList(result) {
@@ -29,8 +29,8 @@ const App = {
   },
   singleTodo(todo) {
     return (`<li>${todo.title}</li>
-      <button onclick="App.edit(${todo.id})">Edit</button>
-      <button onclick="App.delete(${todo.id})">Delete</button>`)
+      <button onclick="App.edit('${todo._id}')">Edit</button>
+      <button onclick="App.delete('${todo._id}')">Delete</button>`)
   },
   add(title) {
     if(title != "") {
@@ -40,6 +40,7 @@ const App = {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({title})
       }
       fetch('api/todos', initObj).then(result => result.json()).then(result => {
@@ -50,12 +51,13 @@ const App = {
       document.getElementById("err").innerHTML = "Title cannot be empty"
     }
   },
-  edit(id) {
-    const todo = this.todos.find(todo => todo.id === id)
+  edit(_id) {
+
+    const todo = this.todos.find(todo => todo._id === _id)
     render(document.getElementById("form"), this.editForm(todo))
 
   },
-  update(id, title) {
+  update(_id, title) {
     if(title != "") {
       const initObj = {
         method: "PUT",
@@ -63,9 +65,10 @@ const App = {
           'Accept': 'application/json',
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({title})
       }
-      fetch(`api/todos/${id}`, initObj).then(result => result.json()).then(result => {
+      fetch(`api/todos/${_id}`, initObj).then(result => result.json()).then(result => {
         this.todos = result
         render(root, this.display(result))
       }).catch(err => console.log(err))
@@ -74,7 +77,8 @@ const App = {
     }
   },
   delete(id) {
-    fetch(`api/todos/${id}`, {method: "delete"}).then(result => result.json()).then(result => {
+    fetch(`api/todos/${id}`, {method: "delete", credentials: 'include'})
+    .then(result => result.json()).then(result => {
       this.todos = result
       render(root, this.display(result))
     }).catch(err => console.log(err))
