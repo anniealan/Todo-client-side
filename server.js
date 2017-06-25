@@ -11,7 +11,7 @@ mongoose.Promise = global.Promise
 mongoose.connect('mongodb://localhost:27017/todos')
 
 
-const PORT = 8080
+const PORT = 3000
 const app = express()
 
 const cookieParser = require('cookie-parser') 
@@ -46,7 +46,7 @@ app.use((req, res, next) => {
 
 app.get('/', (req, res)=>{
    
-    res.sendFile(path.join(__dirname, '/views/index.html'))
+    res.sendFile(path.join(__dirname, '/public/index.html'))
 
 })
 
